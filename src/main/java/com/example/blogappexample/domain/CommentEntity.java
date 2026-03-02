@@ -29,7 +29,7 @@ public class CommentEntity {
     private UserEntity user;
 
     @NotBlank
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id", nullable = false)
     private PostEntity post;
 
