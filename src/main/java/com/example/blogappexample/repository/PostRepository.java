@@ -1,4 +1,10 @@
 package com.example.blogappexample.repository;
 
-public interface PostRepository {
+import com.example.blogappexample.domain.PostEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+
+public interface PostRepository extends JpaRepository<PostEntity, Long> {
+    List<PostEntity> findByUserId(Long userId);
 }
