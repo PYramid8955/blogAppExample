@@ -12,7 +12,7 @@ public class UserStatusEntity {
     @Column(length = 20)
     private String status;
 
-    @OneToMany(mappedBy = "status")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "status")
     private List<UserEntity> users;
 
     public UserStatusEntity() {}

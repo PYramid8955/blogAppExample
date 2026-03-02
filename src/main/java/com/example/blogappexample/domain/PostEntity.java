@@ -33,16 +33,16 @@ public class PostEntity {
     private LocalDateTime updateTime;
 
     @NotBlank
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
     @NotBlank
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
     private PostStatusEntity status;
 
-    @OneToMany(mappedBy = "post")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "post")
     private List<CommentEntity> comments;
 
     public PostEntity() {

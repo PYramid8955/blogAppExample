@@ -12,7 +12,7 @@ public class PostStatusEntity {
     @Column(length = 20)
     private String status;
 
-    @OneToMany(mappedBy = "status")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "status")
     private List<PostEntity> posts;
 
     public PostStatusEntity() {

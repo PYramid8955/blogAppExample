@@ -34,14 +34,14 @@ public class UserEntity {
     private String email;
 
     @NotBlank
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
     private UserStatusEntity status;
 
-    @OneToMany(mappedBy = "user") // "user" is the field name defined in java, not in the db!!!
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user") // "user" is the field name defined in java, not in the db!!!
     private List<CommentEntity> comments;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
     private List<PostEntity> posts;
 
     public UserEntity() {
