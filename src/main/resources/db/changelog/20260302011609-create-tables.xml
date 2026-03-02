@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.9.xsd">
+
+    <changeSet id="20260302-21-create-table" author="Stanislav">
+        <!-- user_status table -->
+        <createTable tableName="user_status">
+            <column name="status" type="VARCHAR(20)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- users table -->
+        <createTable tableName="users">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="username" type="VARCHAR(50)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="password" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="first_name" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_name" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="email" type="VARCHAR(100)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="status" type="VARCHAR(20)">
+                <constraints nullable="false"
+                             foreignKeyName="fk_user_status"
+                             references="user_status(status)"/>
+            </column>
+        </createTable>
+
+        <!-- post_status table -->
+        <createTable tableName="post_status">
+            <column name="status" type="VARCHAR(20)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- posts table -->
+        <createTable tableName="posts">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="title" type="VARCHAR(200)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="content" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="create_time" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_time" type="TIMESTAMP"/>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"
+                             foreignKeyName="fk_post_user"
+                             references="users(id)"
+                             deleteCascade="true"/>
+            </column>
+            <column name="status" type="VARCHAR(20)">
+                <constraints nullable="false"
+                             foreignKeyName="fk_post_status"
+                             references="post_status(status)"/>
+            </column>
+        </createTable>
+
+        <!-- comments table -->
+        <createTable tableName="comments">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="content" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="create_time" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"
+                             foreignKeyName="fk_comment_user"
+                             references="users(id)"
+                             deleteCascade="true"/>
+            </column>
+            <column name="post_id" type="BIGINT">
+                <constraints nullable="false"
+                             foreignKeyName="fk_comment_post"
+                             references="posts(id)"
+                             deleteCascade="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

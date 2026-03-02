@@ -17,6 +17,9 @@ public class PostEntity {
     private Long id;
 
     @NotBlank
+    @Column(nullable = false, length = 200)
+    private String title;
+
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
@@ -45,14 +48,23 @@ public class PostEntity {
     public PostEntity() {
     }
 
-    public PostEntity(Long id, String content, LocalDateTime createTime, LocalDateTime updateTime, UserEntity user, PostStatusEntity status, List<CommentEntity> comments) {
+    public PostEntity(Long id, String title, String content, LocalDateTime createTime, LocalDateTime updateTime, UserEntity user, PostStatusEntity status, List<CommentEntity> comments) {
         this.id = id;
+        this.title = title;
         this.content = content;
         this.createTime = createTime;
         this.updateTime = updateTime;
         this.user = user;
         this.status = status;
         this.comments = comments;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public Long getId() {
@@ -115,18 +127,19 @@ public class PostEntity {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         PostEntity that = (PostEntity) o;
-        return Objects.equals(id, that.id) && Objects.equals(content, that.content) && Objects.equals(createTime, that.createTime) && Objects.equals(updateTime, that.updateTime) && Objects.equals(user, that.user) && Objects.equals(status, that.status) && Objects.equals(comments, that.comments);
+        return Objects.equals(id, that.id) && Objects.equals(title, that.title) && Objects.equals(content, that.content) && Objects.equals(createTime, that.createTime) && Objects.equals(updateTime, that.updateTime) && Objects.equals(user, that.user) && Objects.equals(status, that.status) && Objects.equals(comments, that.comments);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, content, createTime, updateTime, user, status, comments);
+        return Objects.hash(id, title, content, createTime, updateTime, user, status, comments);
     }
 
     @Override
     public String toString() {
         return "PostEntity{" +
                 "id=" + id +
+                ", title='" + title + '\'' +
                 ", content='" + content + '\'' +
                 ", createTime=" + createTime +
                 ", updateTime=" + updateTime +
