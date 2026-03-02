@@ -8,10 +8,12 @@ import com.example.blogappexample.repository.CommentRepository;
 import com.example.blogappexample.repository.PostRepository;
 import com.example.blogappexample.repository.UserRepository;
 import com.example.blogappexample.web.dto.CommentDto;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -74,6 +76,12 @@ public class CommentService {
         CommentEntity comment = commentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Comment not found with id: " + id));
 
+        String currentUsername = Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
+
+        if (!(comment.getUser().getUsername().equals(currentUsername) || currentUsername.equals("admin"))) {
+            throw new SecurityException("You can only update your own comments");
+        }
+
         comment.setContent(dto.getContent());
 
         CommentEntity updated = commentRepository.save(comment);
@@ -82,9 +90,15 @@ public class CommentService {
 
     @Transactional
     public void deleteComment(Long id) {
-        if (!commentRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Comment not found with id: " + id);
+        CommentEntity comment = commentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Comment not found with id: " + id));
+
+        String currentUsername = Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
+
+        if (!(comment.getUser().getUsername().equals(currentUsername) || currentUsername.equals("admin"))) {
+            throw new SecurityException("You can only delete your own comments");
         }
+
         commentRepository.deleteById(id);
     }
 

@@ -8,10 +8,13 @@ import com.example.blogappexample.repository.PostRepository;
 import com.example.blogappexample.repository.PostStatusRepository;
 import com.example.blogappexample.repository.UserRepository;
 import com.example.blogappexample.web.dto.PostDto;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -72,6 +75,11 @@ public class PostService {
         PostEntity post = postRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Post not found with id: " + id));
 
+        String currentUsername = Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
+        if (!(post.getUser().getUsername().equals(currentUsername) || currentUsername.equals("admin"))) {
+            throw new SecurityException("You can only update your own posts");
+        }
+
         // If user changed, check existence
         if (!post.getUser().getId().equals(dto.getUserId())) {
             UserEntity user = userRepository.findById(dto.getUserId())
@@ -92,9 +100,15 @@ public class PostService {
 
     @Transactional
     public void deletePost(Long id) {
-        if (!postRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Post not found with id: " + id);
+        PostEntity post = postRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Post not found with id: " + id));
+
+        String currentUsername = Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
+
+        if (!(post.getUser().getUsername().equals(currentUsername) || currentUsername.equals("admin"))) {
+            throw new SecurityException("You can only delete your own posts");
         }
+
         postRepository.deleteById(id);
     }
 

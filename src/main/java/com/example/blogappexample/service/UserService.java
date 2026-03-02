@@ -6,11 +6,13 @@ import com.example.blogappexample.exception.ResourceNotFoundException;
 import com.example.blogappexample.repository.UserRepository;
 import com.example.blogappexample.repository.UserStatusRepository;
 import com.example.blogappexample.web.dto.UserDto;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -51,6 +53,12 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public List<UserDto> getAllUsers() {
+        String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        if (!currentUsername.equals("admin")) {
+            throw new SecurityException("You can only delete your own account");
+        }
+
         return userRepository.findAll().stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
@@ -67,6 +75,12 @@ public class UserService {
     public UserDto updateUser(Long id, UserDto dto) {
         UserEntity user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+
+        String currentUsername = Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
+
+        if (!(user.getUsername().equals(currentUsername) || currentUsername.equals("admin"))) {
+            throw new SecurityException("You can only update your own account");
+        }
 
         // Check uniqueness if changed
         if (!user.getUsername().equals(dto.getUsername()) && userRepository.existsByUsername(dto.getUsername())) {
@@ -95,10 +109,17 @@ public class UserService {
 
     @Transactional
     public void deleteUser(Long id) {
-        if (!userRepository.existsById(id)) {
-            throw new ResourceNotFoundException("User not found with id: " + id);
+        UserEntity user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+
+        // get current logged-in username
+        String currentUsername = Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
+
+        if (!(user.getUsername().equals(currentUsername) || currentUsername.equals("admin"))) {
+            throw new SecurityException("You can only delete your own account");
         }
-        userRepository.deleteById(id);
+
+        userRepository.delete(user);
     }
 
     private UserDto mapToDto(UserEntity user) {
