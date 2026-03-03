@@ -2,6 +2,7 @@ package com.example.blogappexample.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -23,7 +24,6 @@ public class PostEntity {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    @NotBlank
     @CreationTimestamp
     @Column(name = "create_time", nullable = false, updatable = false)
     private LocalDateTime createTime;
@@ -32,14 +32,14 @@ public class PostEntity {
     @Column(name = "update_time")
     private LocalDateTime updateTime;
 
-    @NotBlank
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
-    @NotBlank
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false)
+    @JoinColumn(name = "status", nullable = false)
     private PostStatusEntity status;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "post")

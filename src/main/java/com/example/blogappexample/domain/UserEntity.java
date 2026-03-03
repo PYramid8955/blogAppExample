@@ -2,6 +2,7 @@ package com.example.blogappexample.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
 import java.util.Objects;
@@ -33,9 +34,9 @@ public class UserEntity {
     @Column(nullable = false, unique = true, length = 100)
     private String email;
 
-    @NotBlank
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false)
+    @JoinColumn(name = "status", nullable = false)
     private UserStatusEntity status;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user") // "user" is the field name defined in java, not in the db!!!
