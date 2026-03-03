@@ -14,7 +14,6 @@ public class CommentDto {
 
     private LocalDateTime createTime;
 
-    @NotNull
     private Long userId;
 
     @NotNull

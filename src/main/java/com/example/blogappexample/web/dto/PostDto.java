@@ -20,7 +20,6 @@ public class PostDto {
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
 
-    @NotNull
     private Long userId;
 
     @NotBlank
