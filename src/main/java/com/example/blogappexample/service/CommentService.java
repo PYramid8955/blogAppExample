@@ -30,8 +30,9 @@ public class CommentService {
 
     @Transactional
     public CommentDto createComment(CommentDto dto) {
-        UserEntity user = userRepository.findById(dto.getUserId())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + dto.getUserId()));
+        String currentUsername = Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
+        UserEntity user = userRepository.findByUsername(currentUsername)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with username: " + currentUsername));
         PostEntity post = postRepository.findById(dto.getPostId())
                 .orElseThrow(() -> new ResourceNotFoundException("Post not found with id: " + dto.getPostId()));
 

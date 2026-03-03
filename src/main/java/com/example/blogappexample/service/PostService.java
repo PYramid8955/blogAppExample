@@ -31,8 +31,9 @@ public class PostService {
 
     @Transactional
     public PostDto createPost(PostDto dto) {
-        UserEntity user = userRepository.findById(dto.getUserId())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + dto.getUserId()));
+        String currentUsername = Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
+        UserEntity user = userRepository.findByUsername(currentUsername)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with username: " + currentUsername));
         PostStatusEntity status = postStatusRepository.findById(dto.getStatus())
                 .orElseThrow(() -> new ResourceNotFoundException("PostStatus not found: " + dto.getStatus()));
 
@@ -48,6 +49,12 @@ public class PostService {
 
     @Transactional(readOnly = true)
     public List<PostDto> getAllPosts() {
+        String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        if (!currentUsername.equals("admin")) {
+            throw new SecurityException("Special authorization required!");
+        }
+
         return postRepository.findAll().stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());

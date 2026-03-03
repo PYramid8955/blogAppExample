@@ -56,7 +56,7 @@ public class UserService {
         String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
 
         if (!currentUsername.equals("admin")) {
-            throw new SecurityException("You can only delete your own account");
+            throw new SecurityException("Special authorization required!");
         }
 
         return userRepository.findAll().stream()
