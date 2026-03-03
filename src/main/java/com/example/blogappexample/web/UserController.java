@@ -27,7 +27,8 @@ public class UserController {
 
     @GetMapping
     public List<UserDto> getAllUsers() {
-        return userService.getAllUsers();
+        try {return userService.getAllUsers();}
+        catch (Exception e) {throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());}
     }
 
     @GetMapping("/{id}")
