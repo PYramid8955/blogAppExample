@@ -79,6 +79,7 @@ public class PostService {
 
     @Transactional
     public PostDto updatePost(Long id, PostDto dto) {
+        //TODO: ADD CHECKSUMS + CHECKS TO VERIFY IF FIELD NOT NULL, THEN UPDATE (SO THAT YOU DON'T SEND OLD DATA)
         PostEntity post = postRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Post not found with id: " + id));
 
