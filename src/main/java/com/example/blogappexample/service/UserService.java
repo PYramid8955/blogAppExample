@@ -29,22 +29,22 @@ public class UserService {
 
     @Transactional
     public UserDto createUser(UserDto dto) {
-        if (userRepository.existsByUsername(dto.getUsername())) {
+        if (userRepository.existsByUsername(dto.username())) {
             throw new IllegalArgumentException("Username already exists");
         }
-        if (userRepository.existsByEmail(dto.getEmail())) {
+        if (userRepository.existsByEmail(dto.email())) {
             throw new IllegalArgumentException("Email already exists");
         }
 
-        UserStatusEntity status = userStatusRepository.findById(dto.getStatus())
-                .orElseThrow(() -> new ResourceNotFoundException("UserStatus not found: " + dto.getStatus()));
+        UserStatusEntity status = userStatusRepository.findById(dto.status())
+                .orElseThrow(() -> new ResourceNotFoundException("UserStatus not found: " + dto.status()));
 
         UserEntity user = new UserEntity();
-        user.setUsername(dto.getUsername());
-        user.setPassword(passwordEncoder.encode(dto.getPassword())); // encrypt password
-        user.setFirstName(dto.getFirstName());
-        user.setLastName(dto.getLastName());
-        user.setEmail(dto.getEmail());
+        user.setUsername(dto.username());
+        user.setPassword(passwordEncoder.encode(dto.password())); // encrypt password
+        user.setFirstName(dto.firstName());
+        user.setLastName(dto.lastName());
+        user.setEmail(dto.email());
         user.setStatus(status);
 
         UserEntity saved = userRepository.save(user);
@@ -53,7 +53,7 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public List<UserDto> getAllUsers() {
-        String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+        String currentUsername = Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
 
         if (!currentUsername.equals("admin")) {
             throw new SecurityException("Special authorization required!");
@@ -83,24 +83,24 @@ public class UserService {
         }
 
         // Check uniqueness if changed
-        if (!user.getUsername().equals(dto.getUsername()) && userRepository.existsByUsername(dto.getUsername())) {
+        if (!user.getUsername().equals(dto.username()) && userRepository.existsByUsername(dto.username())) {
             throw new IllegalArgumentException("Username already exists");
         }
-        if (!user.getEmail().equals(dto.getEmail()) && userRepository.existsByEmail(dto.getEmail())) {
+        if (!user.getEmail().equals(dto.email()) && userRepository.existsByEmail(dto.email())) {
             throw new IllegalArgumentException("Email already exists");
         }
 
-        UserStatusEntity status = userStatusRepository.findById(dto.getStatus())
-                .orElseThrow(() -> new ResourceNotFoundException("UserStatus not found: " + dto.getStatus()));
+        UserStatusEntity status = userStatusRepository.findById(dto.status())
+                .orElseThrow(() -> new ResourceNotFoundException("UserStatus not found: " + dto.status()));
 
-        user.setUsername(dto.getUsername());
+        user.setUsername(dto.username());
         // Only update password if provided (optional)
-        if (dto.getPassword() != null && !dto.getPassword().isEmpty()) {
-            user.setPassword(passwordEncoder.encode(dto.getPassword()));
+        if (dto.password() != null && !dto.password().isEmpty()) {
+            user.setPassword(passwordEncoder.encode(dto.password()));
         }
-        user.setFirstName(dto.getFirstName());
-        user.setLastName(dto.getLastName());
-        user.setEmail(dto.getEmail());
+        user.setFirstName(dto.firstName());
+        user.setLastName(dto.lastName());
+        user.setEmail(dto.email());
         user.setStatus(status);
 
         UserEntity updated = userRepository.save(user);
@@ -123,14 +123,14 @@ public class UserService {
     }
 
     private UserDto mapToDto(UserEntity user) {
-        UserDto dto = new UserDto();
-        dto.setId(user.getId());
-        dto.setUsername(user.getUsername());
-        // do NOT set password in DTO for output
-        dto.setFirstName(user.getFirstName());
-        dto.setLastName(user.getLastName());
-        dto.setEmail(user.getEmail());
-        dto.setStatus(user.getStatus().getStatus()); // the status name
-        return dto;
+        return new UserDto(
+                user.getId(),
+                user.getUsername(),
+                null,
+                user.getFirstName(),
+                user.getLastName(),
+                user.getEmail(),
+                user.getStatus().getStatus()
+                );
     }
 }

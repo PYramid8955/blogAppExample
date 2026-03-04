@@ -33,11 +33,11 @@ public class CommentService {
         String currentUsername = Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
         UserEntity user = userRepository.findByUsername(currentUsername)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with username: " + currentUsername));
-        PostEntity post = postRepository.findById(dto.getPostId())
-                .orElseThrow(() -> new ResourceNotFoundException("Post not found with id: " + dto.getPostId()));
+        PostEntity post = postRepository.findById(dto.postId())
+                .orElseThrow(() -> new ResourceNotFoundException("Post not found with id: " + dto.postId()));
 
         CommentEntity comment = new CommentEntity();
-        comment.setContent(dto.getContent());
+        comment.setContent(dto.content());
         comment.setUser(user);
         comment.setPost(post);
 
@@ -83,7 +83,7 @@ public class CommentService {
             throw new SecurityException("You can only update your own comments");
         }
 
-        comment.setContent(dto.getContent());
+        comment.setContent(dto.content());
 
         CommentEntity updated = commentRepository.save(comment);
         return mapToDto(updated);
@@ -104,12 +104,12 @@ public class CommentService {
     }
 
     private CommentDto mapToDto(CommentEntity comment) {
-        CommentDto dto = new CommentDto();
-        dto.setId(comment.getId());
-        dto.setContent(comment.getContent());
-        dto.setCreateTime(comment.getCreateTime());
-        dto.setUserId(comment.getUser().getId());
-        dto.setPostId(comment.getPost().getId());
-        return dto;
+        return new CommentDto(
+                comment.getId(),
+                comment.getContent(),
+                comment.getCreateTime(),
+                comment.getUser().getId(),
+                comment.getPost().getId()
+        );
     }
 }

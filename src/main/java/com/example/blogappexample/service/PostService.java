@@ -34,12 +34,12 @@ public class PostService {
         String currentUsername = Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
         UserEntity user = userRepository.findByUsername(currentUsername)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with username: " + currentUsername));
-        PostStatusEntity status = postStatusRepository.findById(dto.getStatus())
-                .orElseThrow(() -> new ResourceNotFoundException("PostStatus not found: " + dto.getStatus()));
+        PostStatusEntity status = postStatusRepository.findById(dto.status())
+                .orElseThrow(() -> new ResourceNotFoundException("PostStatus not found: " + dto.status()));
 
         PostEntity post = new PostEntity();
-        post.setTitle(dto.getTitle());
-        post.setContent(dto.getContent());
+        post.setTitle(dto.title());
+        post.setContent(dto.content());
         post.setUser(user);
         post.setStatus(status);
 
@@ -89,17 +89,17 @@ public class PostService {
         }
 
         // If user changed, check existence
-        if (!post.getUser().getId().equals(dto.getUserId())) {
-            UserEntity user = userRepository.findById(dto.getUserId())
-                    .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + dto.getUserId()));
+        if (!post.getUser().getId().equals(dto.userId())) {
+            UserEntity user = userRepository.findById(dto.userId())
+                    .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + dto.userId()));
             post.setUser(user);
         }
 
-        PostStatusEntity status = postStatusRepository.findById(dto.getStatus())
-                .orElseThrow(() -> new ResourceNotFoundException("PostStatus not found: " + dto.getStatus()));
+        PostStatusEntity status = postStatusRepository.findById(dto.status())
+                .orElseThrow(() -> new ResourceNotFoundException("PostStatus not found: " + dto.status()));
 
-        post.setTitle(dto.getTitle());
-        post.setContent(dto.getContent());
+        post.setTitle(dto.title());
+        post.setContent(dto.content());
         post.setStatus(status);
 
         PostEntity updated = postRepository.save(post);
@@ -121,14 +121,14 @@ public class PostService {
     }
 
     private PostDto mapToDto(PostEntity post) {
-        PostDto dto = new PostDto();
-        dto.setId(post.getId());
-        dto.setTitle(post.getTitle());
-        dto.setContent(post.getContent());
-        dto.setCreateTime(post.getCreateTime());
-        dto.setUpdateTime(post.getUpdateTime());
-        dto.setUserId(post.getUser().getId());
-        dto.setStatus(post.getStatus().getStatus());
-        return dto;
+        return new PostDto(
+                post.getId(),
+                post.getTitle(),
+                post.getContent(),
+                post.getCreateTime(),
+                post.getUpdateTime(),
+                post.getUser().getId(),
+                post.getStatus().getStatus()
+                );
     }
 }
