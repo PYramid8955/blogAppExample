@@ -6,7 +6,6 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -42,20 +41,13 @@ public class CommentController {
 
     @PutMapping("/{id}")
     public CommentDto updateComment(@PathVariable Long id, @Valid @RequestBody CommentDto dto) {
-        try { return commentService.updateComment(id, dto); }
-        catch (SecurityException ex) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, ex.getMessage());
-        }
-
+        return commentService.updateComment(id, dto);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteComment(@PathVariable Long id) {
-        try {
-            commentService.deleteComment(id);
-        } catch (SecurityException ex) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, ex.getMessage());
-        }
+    public ResponseEntity<Object> deleteComment(@PathVariable Long id) {
+        commentService.deleteComment(id);
+        return ResponseEntity.noContent().build();
     }
 }

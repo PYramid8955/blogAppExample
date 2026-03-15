@@ -8,6 +8,8 @@ import com.example.blogappexample.repository.PostRepository;
 import com.example.blogappexample.repository.PostStatusRepository;
 import com.example.blogappexample.repository.UserRepository;
 import com.example.blogappexample.web.dto.PostDto;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,12 +51,6 @@ public class PostService {
 
     @Transactional(readOnly = true)
     public List<PostDto> getAllPosts() {
-        String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
-
-        if (!currentUsername.equals("admin")) {
-            throw new SecurityException("Special authorization required!");
-        }
-
         return postRepository.findAll().stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
@@ -79,13 +75,12 @@ public class PostService {
 
     @Transactional
     public PostDto updatePost(Long id, PostDto dto) {
-        //TODO: ADD CHECKSUMS + CHECKS TO VERIFY IF FIELD NOT NULL, THEN UPDATE (SO THAT YOU DON'T SEND OLD DATA)
         PostEntity post = postRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Post not found with id: " + id));
 
         String currentUsername = Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
         if (!(post.getUser().getUsername().equals(currentUsername) || currentUsername.equals("admin"))) {
-            throw new SecurityException("You can only update your own posts");
+            throw new AccessDeniedException("You can only update your own posts");
         }
 
         // If user changed, check existence
@@ -114,7 +109,7 @@ public class PostService {
         String currentUsername = Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
 
         if (!(post.getUser().getUsername().equals(currentUsername) || currentUsername.equals("admin"))) {
-            throw new SecurityException("You can only delete your own posts");
+            throw new AccessDeniedException("You can only delete your own posts");
         }
 
         postRepository.deleteById(id);

@@ -8,6 +8,7 @@ import com.example.blogappexample.repository.CommentRepository;
 import com.example.blogappexample.repository.PostRepository;
 import com.example.blogappexample.repository.UserRepository;
 import com.example.blogappexample.web.dto.CommentDto;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -80,7 +81,7 @@ public class CommentService {
         String currentUsername = Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
 
         if (!(comment.getUser().getUsername().equals(currentUsername) || currentUsername.equals("admin"))) {
-            throw new SecurityException("You can only update your own comments");
+            throw new AccessDeniedException("You can only update your own comments");
         }
 
         comment.setContent(dto.content());
@@ -97,7 +98,7 @@ public class CommentService {
         String currentUsername = Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
 
         if (!(comment.getUser().getUsername().equals(currentUsername) || currentUsername.equals("admin"))) {
-            throw new SecurityException("You can only delete your own comments");
+            throw new AccessDeniedException("You can only delete your own comments");
         }
 
         commentRepository.deleteById(id);

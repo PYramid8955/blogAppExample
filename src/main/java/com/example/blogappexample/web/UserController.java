@@ -27,8 +27,7 @@ public class UserController {
 
     @GetMapping
     public List<UserDto> getAllUsers() {
-        try {return userService.getAllUsers();}
-        catch (Exception e) {throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());}
+        return userService.getAllUsers();
     }
 
     @GetMapping("/{id}")
@@ -38,19 +37,13 @@ public class UserController {
 
     @PutMapping("/{id}")
     public UserDto updateUser(@PathVariable Long id, @Valid @RequestBody UserDto dto) {
-        try { return userService.updateUser(id, dto); }
-        catch (SecurityException ex) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, ex.getMessage());
-        }
+        return userService.updateUser(id, dto);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteUser(@PathVariable Long id) {
-        try {
-            userService.deleteUser(id);
-        } catch (SecurityException ex) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, ex.getMessage());
-        }
+    public ResponseEntity<Object> deleteUser(@PathVariable Long id) {
+        userService.deleteUser(id);
+        return ResponseEntity.noContent().build();
     }
 }

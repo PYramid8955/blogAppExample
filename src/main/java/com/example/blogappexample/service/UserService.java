@@ -6,6 +6,7 @@ import com.example.blogappexample.exception.ResourceNotFoundException;
 import com.example.blogappexample.repository.UserRepository;
 import com.example.blogappexample.repository.UserStatusRepository;
 import com.example.blogappexample.web.dto.UserDto;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -56,7 +57,7 @@ public class UserService {
         String currentUsername = Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
 
         if (!currentUsername.equals("admin")) {
-            throw new SecurityException("Special authorization required!");
+            throw new AccessDeniedException("Special authorization required!");
         }
 
         return userRepository.findAll().stream()
@@ -79,7 +80,7 @@ public class UserService {
         String currentUsername = Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
 
         if (!(user.getUsername().equals(currentUsername) || currentUsername.equals("admin"))) {
-            throw new SecurityException("You can only update your own account");
+            throw new AccessDeniedException("You can only update your own account");
         }
 
         // Check uniqueness if changed
@@ -116,7 +117,7 @@ public class UserService {
         String currentUsername = Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
 
         if (!(user.getUsername().equals(currentUsername) || currentUsername.equals("admin"))) {
-            throw new SecurityException("You can only delete your own account");
+            throw new AccessDeniedException("You can only delete your own account");
         }
 
         userRepository.delete(user);

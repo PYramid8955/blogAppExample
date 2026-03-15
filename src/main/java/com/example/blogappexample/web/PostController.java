@@ -2,12 +2,10 @@ package com.example.blogappexample.web;
 
 import com.example.blogappexample.service.PostService;
 import com.example.blogappexample.web.dto.PostDto;
-import com.example.blogappexample.web.dto.UserDto;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -43,19 +41,13 @@ public class PostController {
 
     @PutMapping("/{id}")
     public PostDto updatePost(@PathVariable Long id, @Valid @RequestBody PostDto dto) {
-        try { return postService.updatePost(id, dto); }
-        catch (SecurityException ex) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, ex.getMessage());
-        }
+        return postService.updatePost(id, dto);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deletePost(@PathVariable Long id) {
-        try {
-            postService.deletePost(id);
-        } catch (SecurityException ex) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, ex.getMessage());
-        }
+    public ResponseEntity<Object> deletePost(@PathVariable Long id) {
+        postService.deletePost(id);
+        return ResponseEntity.noContent().build();
     }
 }
